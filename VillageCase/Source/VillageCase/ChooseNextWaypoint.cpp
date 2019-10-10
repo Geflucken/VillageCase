@@ -31,6 +31,6 @@ EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent& Own
 	BlackboardComp->SetValueAsInt(IndexKey.SelectedKeyName, NextIndex);
 
 
-	UE_LOG(LogTemp, Warning, TEXT(" Index:"), Index)
+	//UE_LOG(LogTemp, Warning, TEXT(" Index: %i"), Index)
 	return EBTNodeResult::Succeeded;
 }
