@@ -2,7 +2,7 @@
 
 #include "FP_FirstPersonGameMode.h"
 #include "FP_FirstPersonHUD.h"
-#include "FP_FirstPersonCharacter.h"
+#include "Player/FirstPersonPlayer.h"
 #include "UObject/ConstructorHelpers.h"
 
 AFP_FirstPersonGameMode::AFP_FirstPersonGameMode()
