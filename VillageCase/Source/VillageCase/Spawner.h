@@ -16,7 +16,11 @@ public:
 	ASpawner();
 
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void PlaceActors();
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, float Radius);
+
+private:
+	bool CanSpawnAtLocation(FVector Location, float Radius);
+	bool FindEmptyLocation(FVector& OutLocation,float Radius);
 
 protected:
 	// Called when the game starts or when spawned

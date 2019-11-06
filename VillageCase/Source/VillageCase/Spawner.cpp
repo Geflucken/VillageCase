@@ -2,6 +2,8 @@
 
 
 #include "Spawner.h"
+#include "Engine/World.h"
+#include "Runtime/Engine/Public/DrawDebugHelpers.h"
 
 // Sets default values
 ASpawner::ASpawner()
@@ -11,16 +13,58 @@ ASpawner::ASpawner()
 
 }
 
-void ASpawner::PlaceActors()
+void ASpawner::PlaceActors(TSubclassOf<AActor> ToSpawn, float Radius)
 {
-	FBox SpawnSpace = FBox(FVector(22970,26170,100),FVector(23030,26230,100));
-	for (int i = 0; i < 20; i++)
+	//UE_LOG(LogTemp, Warning, TEXT("ROOT: %s"), *SpawnerLocation.ToCompactString())
+	
+	for (size_t i = 0; i < 20; i++)
 	{
-		FVector SpawnPoint = FMath::RandPointInBox(SpawnSpace);
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Point %s"), *SpawnPoint.ToCompactString())
+		FVector SpawnPoint;
+		bool found = FindEmptyLocation(SpawnPoint, Radius);
+		if (found)
+		{
+			AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+			Spawned->SetActorRelativeLocation(SpawnPoint);
+			Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+			//UE_LOG(LogTemp, Warning, TEXT("Point: %s"), *SpawnPoint.ToCompactString())
+		}
+		
 	}
 }
 
+bool ASpawner::FindEmptyLocation(FVector& OutLocation, float Radius)
+{
+	FBox SpawnSpace(FVector(-200,-200,0), FVector(200,200,0));
+	const int MAX_ATTEMPTS = 100;
+	for (size_t i = 0; i < MAX_ATTEMPTS; i++)
+	{
+		FVector CandidatePoint = FMath::RandPointInBox(SpawnSpace);
+		if (CanSpawnAtLocation(CandidatePoint,Radius))
+		{
+			OutLocation = CandidatePoint;
+			return true;
+		}
+	}
+	UE_LOG(LogTemp, Warning, TEXT("false ") )
+	return false ;
+}
+
+bool ASpawner::CanSpawnAtLocation(FVector Location, float Radius)
+{
+	FHitResult HitResult;
+	FVector GlobalLocation = ActorToWorld().TransformPosition(Location);
+	bool HasHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		GlobalLocation,
+		GlobalLocation + FVector(0,0,1),
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(Radius)
+	);
+	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;
+	DrawDebugCapsule(GetWorld(), GlobalLocation, 0, Radius, FQuat::Identity, ResultColor, true, 100);
+	return !HasHit;
+}
 
 // Called when the game starts or when spawned
 void ASpawner::BeginPlay()
