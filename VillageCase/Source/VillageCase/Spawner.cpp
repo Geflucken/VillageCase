@@ -13,22 +13,22 @@ ASpawner::ASpawner()
 
 }
 
-void ASpawner::PlaceActors(TSubclassOf<AActor> ToSpawn, float Radius)
+void ASpawner::PlaceActor(TSubclassOf<AActor> ToSpawn, float Radius)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ROOT: %s"), *SpawnerLocation.ToCompactString())
-	
-	for (size_t i = 0; i < 20; i++)
+	int32 MaxItems = 1; // If we want to increase the number of actors spawning in the future
+	for (size_t i = 0; i < MaxItems; i++)
 	{
 		FVector SpawnPoint;
 		bool found = FindEmptyLocation(SpawnPoint, Radius);
 		if (found)
 		{
+			float Rotation = FMath::RandRange(-180.f, 180.f);
 			AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
 			Spawned->SetActorRelativeLocation(SpawnPoint);
 			Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-			//UE_LOG(LogTemp, Warning, TEXT("Point: %s"), *SpawnPoint.ToCompactString())
-		}
-		
+			Spawned->SetActorRotation(FRotator(0, Rotation, 0));
+		}	
 	}
 }
 
@@ -61,8 +61,8 @@ bool ASpawner::CanSpawnAtLocation(FVector Location, float Radius)
 		ECollisionChannel::ECC_GameTraceChannel1,
 		FCollisionShape::MakeSphere(Radius)
 	);
-	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;
-	DrawDebugCapsule(GetWorld(), GlobalLocation, 0, Radius, FQuat::Identity, ResultColor, true, 100);
+	/*FColor ResultColor = HasHit ? FColor::Red : FColor::Green;
+	DrawDebugCapsule(GetWorld(), GlobalLocation, 0, Radius, FQuat::Identity, ResultColor, true, 100);*/
 	return !HasHit;
 }
 

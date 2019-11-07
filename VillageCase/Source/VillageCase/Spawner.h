@@ -15,11 +15,15 @@ public:
 	// Sets default values for this actor's properties
 	ASpawner();
 
+	//Spawns a new actor in the game
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, float Radius);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, float Radius);
 
 private:
+	//Checks if the location is suitable for spawning the actor (collisions)
 	bool CanSpawnAtLocation(FVector Location, float Radius);
+
+	//Tries to find a suitable location for spawning around the spawner
 	bool FindEmptyLocation(FVector& OutLocation,float Radius);
 
 protected:
